@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { z } from "zod";
 
 import database from "../Database/database";
 
@@ -9,6 +10,16 @@ export class PostController {
     }
 
     public static async newPost(req:Request,res:Response){
+        try {
+        const data = z.object({
+            id:z.number(),
+            title: z.string().max(30),
+            content: z.string().max(400)
+        })
+        data.parse(req.body)
+        } catch {
+            res.send("Algum campo está errado!")
+        }
         const {id,title,content} = req.body
 
         const newUser = await database.post.create({data:{
@@ -17,10 +28,19 @@ export class PostController {
             content
         }}).then(()=>{
             res.status(201).send("Object Created")
-        }).catch((err)=>console.error(err))
+        }).catch(()=>res.status(401).send("Não foi capaz de criar um post"))
     }
 
     public static async updatePost(req:Request,res:Response){
+       try{
+        const data = z.object({
+            title: z.string().max(30),
+            content: z.string().max(400)
+        })
+        data.parse(req.body)
+         } catch {
+            res.send("Algum campo está errado")
+        }
         const { title,content } = req.body
         const id_post = parseInt(req.params.id)
         const posts = await database.post.update({

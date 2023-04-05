@@ -12,6 +12,4 @@ app.use(Cors());
 app.use(Express.json());
 app.use(routes);
 
-app.listen(process.env.PORT,()=>{
-    console.log("Server Running")
-});
+export { app }
